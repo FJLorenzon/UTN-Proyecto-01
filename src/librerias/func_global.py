@@ -23,3 +23,36 @@ def validar_inicio(inicio, fin, mensaje):
              
         except ValueError: 
             print('\n ** ¡Error! Debe ingresar un número válido ** \n')
+            
+def sumar(a,b):
+    resultado = a + b
+    return resultado
+
+def restar(a,b):
+    resultado = a - b
+    return resultado
+
+def multiplir(a,b):
+    resultado = a * b
+    return resultado
+
+def dividir(a,b):
+    if b != 0:
+        resultado = a / b
+    else: 
+        resultado = '#Div 0'
+    return resultado
+
+def raiz_cuadrada(a):
+    import math
+    resultado = math.sqrt(a)
+    
+    return resultado
+    
+def potencia(base, exponente):
+    
+    resultado = pow(base, exponente)
+    
+    return resultado
+
+
