@@ -5,10 +5,14 @@ Created on 12 jun 2026
 '''
 
 import customtkinter as ctk
+import gui.ventana_principal as app
 
-app = ctk.CTk()
-app.geometry('500x500')
-app.title('Etiquetas')
-
-etiqueta2 = ctk.CTkLabel(master=app, text='Hola ventana', font=('Arial', 16))
-etiqueta2.pack(padx =1000, pady=10, ancho='C', side= 'top')
+if __name__ == "__main__":
+    
+    app = app.MiAppPantallaCompleta('lala')
+    
+    '''
+    etiqueta2 = ctk.CTkLabel(master=app, text='Hola ventana', font=('Arial', 16))
+    etiqueta2.pack(padx=10, pady=10, anchor='center', side= 'top')
+    '''
+    app.mainloop()
