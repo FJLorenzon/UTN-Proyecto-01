@@ -85,9 +85,8 @@ class GraficosWindow(ctk.CTkToplevel):
             values=[
                 "Goles recibidos por partido",
                 "Remates recibidos por partido",
-                "% Eficiencia en pases",
+                "Pases completados",
                 "Centros cortados por partido",
-                "Penales atajados acumulados",
                 "Vista general (4 métricas)",
             ],
             width=240,
@@ -155,8 +154,7 @@ class GraficosWindow(ctk.CTkToplevel):
         cur = con.cursor()
         cur.execute("""
             SELECT partido, goles_recibidos, remates_recibidos,
-                   goles_recibidos, centros_cortados, pases_totales,
-                   pases_ok, penales_atajados
+                   centros_cortados, pases_ok
             FROM partidos_arquero
             WHERE arquero_id = ?
             ORDER BY id ASC
@@ -197,28 +195,18 @@ class GraficosWindow(ctk.CTkToplevel):
         goles      = [d[1] for d in datos]
         remates    = [d[2] for d in datos]
         centros    = [d[3] for d in datos]
-        pases_tot  = [d[4] for d in datos]
-        pases_ok   = [d[5] for d in datos]
-        pen_ataj   = [d[7] for d in datos]
+        pases_ok   = [d[4] for d in datos]
         
-        efic_pases = [round(ok / tot * 100, 1) if tot else 0
-                      for ok, tot in zip(pases_ok, pases_tot)]
-        pen_acum   = []
-        acc = 0
-        for pa in pen_ataj:
-            acc += pa
-            pen_acum.append(acc)
-
         if metrica == "Vista general (4 métricas)":
             fig, axes = plt.subplots(2, 2, figsize=(9, 5.5))
             fig.patch.set_facecolor(MPL_BG)
             fig.subplots_adjust(hspace=0.45, wspace=0.35)
 
             plots = [
-                (axes[0, 0], goles,      "Goles recibidos",         MPL_ROJO),
-                (axes[0, 1], remates,    "Remates recibidos",        MPL_NARANJA),
-                (axes[1, 0], efic_pases, "% Eficiencia en pases",    MPL_AZUL),
-                (axes[1, 1], centros,    "Centros cortados",         MPL_VERDE),
+                (axes[0, 0], goles, "Goles recibidos", MPL_ROJO),
+                (axes[0, 1], remates, "Remates recibidos", MPL_NARANJA),
+                (axes[1, 0], pases_ok, "Pases completados", MPL_AZUL),
+                (axes[1, 1], centros, "Centros cortados", MPL_VERDE),
             ]
 
             for ax, y, titulo, color in plots:
@@ -229,11 +217,10 @@ class GraficosWindow(ctk.CTkToplevel):
             fig.patch.set_facecolor(MPL_BG)
 
             dispatch = {
-                "Goles recibidos por partido":    (goles,      "Goles recibidos",       MPL_ROJO),
-                "Remates recibidos por partido":  (remates,    "Remates recibidos",      MPL_NARANJA),
-                "% Eficiencia en pases":          (efic_pases, "% Eficiencia en pases",  MPL_AZUL),
-                "Centros cortados por partido":   (centros,    "Centros cortados",        MPL_VERDE),
-                "Penales atajados acumulados":    (pen_acum,   "Penales atajados (acum)", MPL_VERDE),
+                "Goles recibidos por partido": (goles, "Goles recibidos", MPL_ROJO),
+                "Remates recibidos por partido": (remates, "Remates recibidos", MPL_NARANJA),
+                "Pases completados": (pases_ok, "Pases completados", MPL_AZUL),
+                "Centros cortados por partido": (centros, "Centros cortados", MPL_VERDE),
             }
 
             y_data, titulo, color = dispatch.get(
