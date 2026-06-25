@@ -4,3 +4,6 @@ venv/
 # Ignorar archivos temporales de Python
 **/__pycache__/
 *.pyc
+
+# Ignorar archivos de base de datos
+*.db
