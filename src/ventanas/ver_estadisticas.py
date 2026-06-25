@@ -12,6 +12,7 @@ Muestra las estadísticas acumuladas y el historial de partidos de un arquero.
 import customtkinter as ctk
 from tkinter import messagebox
 import sqlite3
+import platform  # <-- Importamos para detectar Linux
 import db
 
 COLOR_BG       = "#0d1117"
@@ -53,14 +54,18 @@ class VerEstadisticasWindow(ctk.CTkToplevel):
         # ── Encabezado + selector ────────────────────────────────────────────
         top = ctk.CTkFrame(self, fg_color=COLOR_PANEL, corner_radius=0)
         top.pack(fill="x")
-        ctk.CTkLabel(
+        
+        lbl_titulo = ctk.CTkLabel(
             top,
             text="Estadísticas del arquero",
             font=ctk.CTkFont(size=18, weight="bold"),
             text_color=COLOR_TEXTO
-        ).pack(pady=(20, 8))
+        )
+        lbl_titulo.pack(pady=(20, 8))
+        
         sel_row = ctk.CTkFrame(top, fg_color=COLOR_PANEL)
         sel_row.pack(padx=30, fill="x", pady=(0, 16))
+        
         opciones = list(self._map_nombres.keys()) if self._map_nombres else ["(sin arqueros registrados)"]
         self.combo = ctk.CTkComboBox(
             sel_row,
@@ -75,6 +80,7 @@ class VerEstadisticasWindow(ctk.CTkToplevel):
             command=self._cargar
         )
         self.combo.pack(side="left", expand=True, fill="x", padx=(0, 10))
+        
         ctk.CTkButton(
             sel_row,
             text="Ver",
@@ -87,23 +93,38 @@ class VerEstadisticasWindow(ctk.CTkToplevel):
             text_color="#0d1117",
             font=ctk.CTkFont(weight="bold")
         ).pack(side="left")
+        
         sep = ctk.CTkFrame(self, height=2, fg_color=COLOR_ACENTO, corner_radius=0)
         sep.pack(fill="x")
         
         # ── Área de contenido scrollable ─────────────────────────────────────
         self.scroll = ctk.CTkScrollableFrame(self, fg_color=COLOR_BG, corner_radius=0)
         self.scroll.pack(expand=True, fill="both", padx=0, pady=0)
+        
+        # Vinculamos la ruedita al propio contenedor principal de scroll
+        self._vincular_ruedita(self.scroll)
         self._placeholder()
+
+    def _vincular_ruedita(self, widget):
+        """ Enlaza de manera segura el evento de la ruedita del ratón en Linux/Windows """
+        sistema = platform.system()
+        if sistema == "Linux":
+            widget.bind("<Button-4>", lambda e: self.scroll._parent_canvas.yview_scroll(-1, "units"))
+            widget.bind("<Button-5>", lambda e: self.scroll._parent_canvas.yview_scroll(1, "units"))
+        else:
+            widget.bind("<MouseWheel>", lambda e: self.scroll._parent_canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
 
     # ── Placeholder inicial ──────────────────────────────────────────────────
     def _placeholder(self):
         self._limpiar()
-        ctk.CTkLabel(
+        lbl = ctk.CTkLabel(
             self.scroll,
             text="Seleccioná un arquero para ver sus estadísticas",
             font=ctk.CTkFont(size=13),
             text_color=COLOR_SUBTEXTO
-        ).pack(pady=60)
+        )
+        lbl.pack(pady=60)
+        self._vincular_ruedita(lbl)
 
     def _limpiar(self):
         for w in self.scroll.winfo_children():
@@ -145,15 +166,18 @@ class VerEstadisticasWindow(ctk.CTkToplevel):
         pases_ok   = pases_ok   or 0
         pen_ataj   = pen_ataj   or 0
 
-        ctk.CTkLabel(
+        lbl_tit = ctk.CTkLabel(
             self.scroll,
             text="RESUMEN GLOBAL",
             font=ctk.CTkFont(size=11, weight="bold"),
             text_color=COLOR_ACENTO
-        ).pack(anchor="w", padx=24, pady=(20, 8))
+        )
+        lbl_tit.pack(anchor="w", padx=24, pady=(20, 8))
+        self._vincular_ruedita(lbl_tit)
 
         grid = ctk.CTkFrame(self.scroll, fg_color=COLOR_BG)
         grid.pack(fill="x", padx=24)
+        self._vincular_ruedita(grid)
 
         metricas = [
             ("Partidos",        str(n_partidos or 0)),
@@ -168,34 +192,46 @@ class VerEstadisticasWindow(ctk.CTkToplevel):
             row = i // 3
             card = ctk.CTkFrame(grid, fg_color=COLOR_PANEL, corner_radius=10)
             card.grid(row=row, column=col, padx=6, pady=6, sticky="ew")
-            ctk.CTkLabel(
+            self._vincular_ruedita(card)
+            
+            lbl_val = ctk.CTkLabel(
                 card, text=valor,
                 font=ctk.CTkFont(size=22, weight="bold"),
                 text_color=COLOR_ACENTO
-            ).pack(pady=(12, 2))
-            ctk.CTkLabel(
+            )
+            lbl_val.pack(pady=(12, 2))
+            self._vincular_ruedita(lbl_val)
+            
+            lbl_lbl = ctk.CTkLabel(
                 card, text=label,
                 font=ctk.CTkFont(size=11),
                 text_color=COLOR_SUBTEXTO
-            ).pack(pady=(0, 10))
+            )
+            lbl_lbl.pack(pady=(0, 10))
+            self._vincular_ruedita(lbl_lbl)
+            
         grid.columnconfigure((0, 1, 2), weight=1)
 
     # ── Historial de partidos ────────────────────────────────────────────────
     def _render_partidos(self, partidos):
-        ctk.CTkLabel(
+        lbl_tit = ctk.CTkLabel(
             self.scroll,
             text="HISTORIAL DE PARTIDOS",
             font=ctk.CTkFont(size=11, weight="bold"),
             text_color=COLOR_ACENTO
-        ).pack(anchor="w", padx=24, pady=(24, 8))
+        )
+        lbl_tit.pack(anchor="w", padx=24, pady=(24, 8))
+        self._vincular_ruedita(lbl_tit)
 
         if not partidos:
-            ctk.CTkLabel(
+            lbl_none = ctk.CTkLabel(
                 self.scroll,
                 text="No hay partidos cargados para este arquero.",
                 font=ctk.CTkFont(size=12),
                 text_color=COLOR_SUBTEXTO
-            ).pack(anchor="w", padx=24)
+            )
+            lbl_none.pack(anchor="w", padx=24)
+            self._vincular_ruedita(lbl_none)
             return
 
         for p in partidos:
@@ -205,24 +241,33 @@ class VerEstadisticasWindow(ctk.CTkToplevel):
 
             card = ctk.CTkFrame(self.scroll, fg_color=COLOR_PANEL, corner_radius=10)
             card.pack(fill="x", padx=24, pady=5)
+            self._vincular_ruedita(card)
 
             # Cabecera de la tarjeta
             cab = ctk.CTkFrame(card, fg_color=COLOR_PANEL, corner_radius=0)
             cab.pack(fill="x", padx=14, pady=(12, 4))
-            ctk.CTkLabel(
+            self._vincular_ruedita(cab)
+            
+            lbl_part = ctk.CTkLabel(
                 cab, text=partido,
                 font=ctk.CTkFont(size=13, weight="bold"),
                 text_color=COLOR_TEXTO
-            ).pack(side="left")
-            ctk.CTkLabel(
+            )
+            lbl_part.pack(side="left")
+            self._vincular_ruedita(lbl_part)
+            
+            lbl_res = ctk.CTkLabel(
                 cab, text=resultado,
                 font=ctk.CTkFont(size=13, weight="bold"),
                 text_color=COLOR_ACENTO
-            ).pack(side="right")
+            )
+            lbl_res.pack(side="right")
+            self._vincular_ruedita(lbl_res)
 
             # Detalle en dos columnas
             det = ctk.CTkFrame(card, fg_color=COLOR_PANEL)
             det.pack(fill="x", padx=14, pady=(4, 12))
+            self._vincular_ruedita(det)
 
             items = [
                 ("Minutos",         str(minutos)),
@@ -235,10 +280,13 @@ class VerEstadisticasWindow(ctk.CTkToplevel):
             for j, (k, v) in enumerate(items):
                 col = j % 2
                 row = j // 2
-                ctk.CTkLabel(
+                lbl_item = ctk.CTkLabel(
                     det,
                     text=f"{k}:  {v}",
                     font=ctk.CTkFont(size=12),
                     text_color=COLOR_SUBTEXTO
-                ).grid(row=row, column=col, sticky="w", padx=10, pady=2)
+                )
+                lbl_item.grid(row=row, column=col, sticky="w", padx=10, pady=2)
+                self._vincular_ruedita(lbl_item)
+                
             det.columnconfigure((0, 1), weight=1)
