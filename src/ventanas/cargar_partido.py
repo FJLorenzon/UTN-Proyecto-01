@@ -3,6 +3,7 @@ Created on 24 jun 2026
 
 @author: ati05
 '''
+
 # -*- coding: utf-8 -*-
 import customtkinter as ctk
 import platform
@@ -16,8 +17,11 @@ class CargarPartidoWindow(ctk.CTkToplevel):
         self.resizable(False, False)
         self.configure(fg_color="#0d1117")
         self.transient(parent)
-        self.wait_visibility()  # Espera a que la ventana sea visible
-        self.grab_set()         # Captura el foco modal de manera segura
+        
+        # Solución de visibilidad segura para Linux
+        self.wait_visibility()  # Espera a que el sistema operativo la dibuje
+        self.grab_set()         # Ahora sí bloquea la ventana de atrás de forma segura
+        # ───────────────────────────────────────────────────────────────
         
         # ── Encabezado Principal ──────────────────────────────────────
         ctk.CTkLabel(

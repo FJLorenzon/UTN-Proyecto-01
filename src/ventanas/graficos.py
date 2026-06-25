@@ -3,6 +3,7 @@ Created on 24 jun 2026
 
 @author: ati05
 '''
+
 # -*- coding: utf-8 -*-
 """
 ventanas/graficos.py
@@ -49,8 +50,9 @@ class GraficosWindow(ctk.CTkToplevel):
         self.transient(parent)
         
         # Solución de visibilidad segura para Linux
-        self.wait_visibility()
-        self.grab_set()
+        self.wait_visibility()  # Espera a que el sistema operativo la dibuje
+        self.grab_set()         # Ahora sí bloquea la ventana de atrás de forma segura
+        # ───────────────────────────────────────────────────────────────
         self.focus()
 
         # Protocolo para cerrar la ventana limpiando la memoria de Matplotlib
@@ -152,9 +154,9 @@ class GraficosWindow(ctk.CTkToplevel):
         con = sqlite3.connect(db.DATABASE_NAME)
         cur = con.cursor()
         cur.execute("""
-            SELECT rival, goles_recibidos, remates_al_arco,
-                   goles_recibidos, goles_recibidos, goles_recibidos,
-                   goles_recibidos, penales_atajados
+            SELECT partido, goles_recibidos, remates_recibidos,
+                   goles_recibidos, centros_cortados, pases_totales,
+                   pases_ok, penales_atajados
             FROM partidos_arquero
             WHERE arquero_id = ?
             ORDER BY id ASC

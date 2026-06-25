@@ -3,6 +3,7 @@ Created on 24 jun 2026
 
 @author: ati05
 '''
+
 # -*- coding: utf-8 -*-
 import sqlite3
 
@@ -64,7 +65,7 @@ def registrar_arquero(nombre, nacionalidad, nacimiento, altura, peso, seleccion,
     conexion.commit()
     conexion.close()
 
-def registrar_partido(arquero_id, partido, resultado, minutos_jugados, goles, remates, centros, pases_totales, pases_ok, penales_encontra, penales_atajados):
+def registrar_partido(arquero_id, partido, resultado, minutos_jugados, goles_recibidos, remates_recibidos, centros_cortados, pases_totales, pases_ok, penales_encontra, penales_atajados):
     """Inserta las estadísticas de un partido para un arquero específico."""
     conexion = conectar()
     cursor = conexion.cursor()
@@ -72,10 +73,10 @@ def registrar_partido(arquero_id, partido, resultado, minutos_jugados, goles, re
         INSERT INTO partidos_arquero 
         (arquero_id, partido, resultado, minutos_jugados, goles_recibidos, remates_recibidos, centros_cortados, pases_totales, pases_ok, penales_encontra, penales_atajados)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (arquero_id, partido, resultado, minutos_jugados, goles, remates, centros, pases_totales, pases_ok, penales_encontra, penales_atajados))
+    """, (arquero_id, partido, resultado, minutos_jugados, goles_recibidos, remates_recibidos, centros_cortados, pases_totales, pases_ok, penales_encontra, penales_atajados))
     conexion.commit()
     conexion.close()
-
+    
 def obtener_arqueros():
     """Devuelve la lista de todos los arqueros registrados."""
     conexion = conectar()

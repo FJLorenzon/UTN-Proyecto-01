@@ -3,6 +3,7 @@ Created on 24 jun 2026
 
 @author: ati05
 '''
+
 # -*- coding: utf-8 -*-
 import customtkinter as ctk
 from db import registrar_arquero
@@ -15,6 +16,8 @@ class RegistrarArqueroWindow(ctk.CTkToplevel):
         self.resizable(False, False)
         self.configure(fg_color="#0d1117")
         self.transient(parent)
+        
+        # Solución de visibilidad segura para Linux
         self.wait_visibility()  # Espera a que el sistema operativo la dibuje
         self.grab_set()         # Ahora sí bloquea la ventana de atrás de forma segura
         # ───────────────────────────────────────────────────────────────
